@@ -55,6 +55,10 @@ function BusinessProfileSettings() {
               <Input className="mt-2" defaultValue="Mumbai" />
             </div>
             <div>
+              <Label>Address</Label>
+              <Input className="mt-2" defaultValue="123 City Centre Road" placeholder="Enter business address" />
+            </div>
+            <div>
               <Label>Service radius (km)</Label>
               <Input className="mt-2" type="number" defaultValue={25} />
             </div>
