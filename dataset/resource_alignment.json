@@ -1,0 +1,82 @@
+[
+  {
+    "question": "I need 100 chairs for a wedding in Bandra tomorrow",
+    "answer": "Resource type: chairs. Quantity: 100. Location: Bandra. Date: tomorrow. Budget: not specified. Category: wedding. Intent: resource_request."
+  },
+  {
+    "question": "Need 20 tables near Andheri for Saturday under ₹5000",
+    "answer": "Resource type: tables. Quantity: 20. Location: Andheri. Date: Saturday. Budget: ₹5000. Category: hospitality_event. Intent: resource_request."
+  },
+  {
+    "question": "Looking for 50 plates and 50 glasses in Powai",
+    "answer": "Resource types: plates and glasses. Quantities: 50 plates and 50 glasses. Location: Powai. Date: not specified. Budget: not specified. Category: hospitality_event. Intent: resource_request."
+  },
+  {
+    "question": "Can someone provide 200 chairs in Dadar for a corporate event?",
+    "answer": "Resource type: chairs. Quantity: 200. Location: Dadar. Date: not specified. Budget: not specified. Category: corporate_event. Intent: resource_request."
+  },
+  {
+    "question": "I need a projector for a presentation in Lower Parel tomorrow",
+    "answer": "Resource type: projector. Quantity: 1. Location: Lower Parel. Date: tomorrow. Budget: not specified. Category: corporate_event. Intent: resource_request."
+  },
+  {
+    "question": "Need 4 speakers and 2 microphones for an event in Kurla",
+    "answer": "Resource types: speakers and microphones. Quantities: 4 speakers and 2 microphones. Location: Kurla. Date: not specified. Budget: not specified. Category: event_equipment. Intent: resource_request."
+  },
+  {
+    "question": "Looking for 10 round tables near Thane under ₹7000",
+    "answer": "Resource type: round tables. Quantity: 10. Location: Thane. Date: not specified. Budget: ₹7000. Category: hospitality_event. Intent: resource_request."
+  },
+  {
+    "question": "We require 300 chairs for a wedding in Borivali next Sunday",
+    "answer": "Resource type: chairs. Quantity: 300. Location: Borivali. Date: next Sunday. Budget: not specified. Category: wedding. Intent: resource_request."
+  },
+  {
+    "question": "Need catering equipment for 150 guests in Vashi",
+    "answer": "Resource type: catering equipment. Quantity: 1 set. Location: Vashi. Date: not specified. Budget: not specified. Category: catering. Intent: resource_request."
+  },
+  {
+    "question": "Need 100 dinner plates, 100 spoons and 100 forks near Navi Mumbai",
+    "answer": "Resource types: dinner plates, spoons and forks. Quantities: 100 each. Location: Navi Mumbai. Date: not specified. Budget: not specified. Category: hospitality_event. Intent: resource_request."
+  },
+  {
+    "question": "Do you have 50 chairs available near Dadar?",
+    "answer": "Resource type: chairs. Quantity: 50. Location: Dadar. Date: not specified. Budget: not specified. Category: hospitality_event. Intent: availability_request."
+  },
+  {
+    "question": "Is a projector available in Andheri for tomorrow?",
+    "answer": "Resource type: projector. Quantity: 1. Location: Andheri. Date: tomorrow. Budget: not specified. Category: corporate_event. Intent: availability_request."
+  },
+  {
+    "question": "I want to rent 100 chairs in Bandra under ₹6000",
+    "answer": "Resource type: chairs. Quantity: 100. Location: Bandra. Date: not specified. Budget: ₹6000. Category: hospitality_event. Intent: rental_request."
+  },
+  {
+    "question": "Need a sound system for 500 people in Worli",
+    "answer": "Resource type: sound system. Quantity: 1. Location: Worli. Date: not specified. Budget: not specified. Category: event_equipment. Intent: resource_request."
+  },
+  {
+    "question": "Looking for 3 large refrigerators for a catering business in Mumbai",
+    "answer": "Resource type: large refrigerators. Quantity: 3. Location: Mumbai. Date: not specified. Budget: not specified. Category: catering. Intent: resource_request."
+  },
+  {
+    "question": "Need 200 food containers in Bhandup by Friday",
+    "answer": "Resource type: food containers. Quantity: 200. Location: Bhandup. Date: Friday. Budget: not specified. Category: catering. Intent: resource_request."
+  },
+  {
+    "question": "I need 40 linen table covers for an event in Vile Parle",
+    "answer": "Resource type: linen table covers. Quantity: 40. Location: Vile Parle. Date: not specified. Budget: not specified. Category: hospitality_event. Intent: resource_request."
+  },
+  {
+    "question": "Can someone provide 12 cocktail tables in Juhu for tonight?",
+    "answer": "Resource type: cocktail tables. Quantity: 12. Location: Juhu. Date: tonight. Budget: not specified. Category: party. Intent: resource_request."
+  },
+  {
+    "question": "Need 75 chairs within 3 km of Powai for Sunday",
+    "answer": "Resource type: chairs. Quantity: 75. Location: Powai. Date: Sunday. Distance preference: within 3 km of Powai. Budget: not specified. Category: hospitality_event. Intent: resource_request."
+  },
+  {
+    "question": "I need resources for a wedding but I'm not sure what equipment I need yet",
+    "answer": "Resource type: event resources. Quantity: not specified. Location: not specified. Date: not specified. Budget: not specified. Category: wedding. Intent: resource_discovery."
+  }
+]

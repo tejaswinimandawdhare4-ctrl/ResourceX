@@ -1,0 +1,38 @@
+import { useEffect } from "react";
+
+export default function CursorGlow() {
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      document.documentElement.style.setProperty(
+        "--mouse-x",
+        `${e.clientX}px`
+      );
+
+      document.documentElement.style.setProperty(
+        "--mouse-y",
+        `${e.clientY}px`
+      );
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  return (
+    <div
+      className="pointer-events-none fixed inset-0 z-50"
+      style={{
+        background: `
+          radial-gradient(
+            350px circle at var(--mouse-x) var(--mouse-y),
+            rgba(45, 230, 210, 0.08),
+            transparent 70%
+          )
+        `,
+      }}
+    />
+  );
+}
