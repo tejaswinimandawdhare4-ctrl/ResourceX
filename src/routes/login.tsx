@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Building2, LogIn, UserPlus } from "lucide-react";
+import { Building2, Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Logo } from "@/components/brand/Logo";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cities } from "@/lib/resourcex-data";
+import { useAuth, type UserRole } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -30,11 +31,88 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [role, setRole] = useState<"provider" | "seeker">("provider");
+  const { login, register } = useAuth();
 
-  const go = (label: string) => {
-    toast.success(label, { description: "Prototype session started as a demo business account." });
-    navigate({ to: role === "provider" ? "/dashboard" : "/search" });
+  // Sign-in state
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginRole, setLoginRole] = useState<UserRole>("provider");
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [showLoginPwd, setShowLoginPwd] = useState(false);
+
+  // Register state
+  const [regBusinessName, setRegBusinessName] = useState("");
+  const [regBusinessType, setRegBusinessType] = useState("");
+  const [regCity, setRegCity] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regRole, setRegRole] = useState<UserRole>("provider");
+  const [regLoading, setRegLoading] = useState(false);
+  const [showRegPwd, setShowRegPwd] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!loginEmail.trim()) {
+      toast.error("Please enter your business email");
+      return;
+    }
+    if (!loginPassword) {
+      toast.error("Please enter your password");
+      return;
+    }
+
+    setLoginLoading(true);
+    try {
+      await login(loginEmail.trim(), loginPassword, loginRole);
+      toast.success("Signed in successfully!", {
+        description: `Welcome back. You're signed in as a ${loginRole}.`,
+      });
+      navigate({ to: loginRole === "provider" ? "/dashboard" : "/search" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Login failed";
+      toast.error("Login failed", { description: message });
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!regBusinessName.trim()) {
+      toast.error("Business name is required");
+      return;
+    }
+    if (!regEmail.trim()) {
+      toast.error("Business email is required");
+      return;
+    }
+    if (regPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    setRegLoading(true);
+    try {
+      await register({
+        business_name: regBusinessName.trim(),
+        business_type: regBusinessType.trim() || "Hotel",
+        email: regEmail.trim(),
+        password: regPassword,
+        city: regCity.trim() || "Mumbai",
+        role: regRole,
+      });
+      toast.success("Account created!", {
+        description: "Your business account is ready.",
+      });
+      navigate({ to: regRole === "provider" ? "/dashboard" : "/search" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Registration failed";
+      toast.error("Registration failed", { description: message });
+    } finally {
+      setRegLoading(false);
+    }
   };
 
   return (
@@ -45,7 +123,6 @@ function LoginPage() {
           <Logo showTagline />
         </div>
 
-
         <div className="mt-8 panel p-6">
           <Tabs defaultValue="login">
             <TabsList className="grid w-full grid-cols-2">
@@ -53,58 +130,157 @@ function LoginPage() {
               <TabsTrigger value="register">Register business</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="login" className="mt-6 space-y-4">
-              <div>
-                <Label>Business email</Label>
-                <Input className="mt-2" type="email" defaultValue="ops@hotelhorizon.in" />
-              </div>
-              <div>
-                <Label>Password</Label>
-                <Input className="mt-2" type="password" defaultValue="demo1234" />
-              </div>
-              <RolePicker role={role} setRole={setRole} />
-              <Button className="w-full" size="lg" onClick={() => go("Signed in")}>
-                <LogIn className="h-4 w-4" /> Sign in
-              </Button>
+            {/* ── Login tab ── */}
+            <TabsContent value="login" className="mt-6">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <Label htmlFor="login-email">Business email</Label>
+                  <Input
+                    id="login-email"
+                    className="mt-2"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="ops@yourbusiness.in"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="login-password">Password</Label>
+                  <div className="relative mt-2">
+                    <Input
+                      id="login-password"
+                      type={showLoginPwd ? "text" : "password"}
+                      autoComplete="current-password"
+                      placeholder="Your password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      onClick={() => setShowLoginPwd((v) => !v)}
+                    >
+                      {showLoginPwd ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <RolePicker role={loginRole} setRole={setLoginRole} />
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={loginLoading}
+                >
+                  <LogIn className="h-4 w-4" />
+                  {loginLoading ? "Signing in…" : "Sign in"}
+                </Button>
+              </form>
             </TabsContent>
 
-            <TabsContent value="register" className="mt-6 space-y-4">
-              <div>
-                <Label>Business name</Label>
-                <Input className="mt-2" placeholder="Hotel Horizon" />
-              </div>
-              <div>
-                <Label>Business type</Label>
-                <Input className="mt-2" placeholder="Hotel, banquet hall, event company…" />
-              </div>
-              <div>
-                <Label>City</Label>
-                <Input className="mt-2" list="rx-login-cities" placeholder="Mumbai" />
-                <datalist id="rx-login-cities">
-                  {cities.map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
-              </div>
-              <div>
-                <Label>Business email</Label>
-                <Input className="mt-2" type="email" placeholder="ops@yourbusiness.in" />
-              </div>
-              <div>
-                <Label>Password</Label>
-                <Input className="mt-2" type="password" placeholder="At least 8 characters" />
-              </div>
-              <RolePicker role={role} setRole={setRole} />
-              <Button className="w-full" size="lg" onClick={() => go("Business registered")}>
-                <UserPlus className="h-4 w-4" /> Create business account
-              </Button>
+            {/* ── Register tab ── */}
+            <TabsContent value="register" className="mt-6">
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div>
+                  <Label htmlFor="reg-name">Business name</Label>
+                  <Input
+                    id="reg-name"
+                    className="mt-2"
+                    placeholder="Hotel Horizon"
+                    value={regBusinessName}
+                    onChange={(e) => setRegBusinessName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="reg-type">Business type</Label>
+                  <Input
+                    id="reg-type"
+                    className="mt-2"
+                    placeholder="Hotel, banquet hall, event company…"
+                    value={regBusinessType}
+                    onChange={(e) => setRegBusinessType(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="reg-city">City</Label>
+                  <Input
+                    id="reg-city"
+                    className="mt-2"
+                    list="rx-login-cities"
+                    placeholder="Mumbai"
+                    value={regCity}
+                    onChange={(e) => setRegCity(e.target.value)}
+                  />
+                  <datalist id="rx-login-cities">
+                    {cities.map((c) => (
+                      <option key={c} value={c} />
+                    ))}
+                  </datalist>
+                </div>
+                <div>
+                  <Label htmlFor="reg-email">Business email</Label>
+                  <Input
+                    id="reg-email"
+                    className="mt-2"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="ops@yourbusiness.in"
+                    value={regEmail}
+                    onChange={(e) => setRegEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="reg-password">Password</Label>
+                  <div className="relative mt-2">
+                    <Input
+                      id="reg-password"
+                      type={showRegPwd ? "text" : "password"}
+                      autoComplete="new-password"
+                      placeholder="At least 8 characters"
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      onClick={() => setShowRegPwd((v) => !v)}
+                    >
+                      {showRegPwd ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <RolePicker role={regRole} setRole={setRegRole} />
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={regLoading}
+                >
+                  <UserPlus className="h-4 w-4" />
+                  {regLoading ? "Creating account…" : "Create business account"}
+                </Button>
+              </form>
             </TabsContent>
           </Tabs>
 
           <p className="mt-5 flex items-start gap-2 text-[11px] leading-relaxed text-muted-foreground">
             <Building2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-            Hackathon prototype: authentication is simulated, and any credentials open a demo business
-            account.
+            All data is securely stored. Your credentials are hashed and never shared.
           </p>
         </div>
 
@@ -131,6 +307,7 @@ function RolePicker({
       <div className="mt-2 grid grid-cols-2 gap-2">
         {(["provider", "seeker"] as const).map((r) => (
           <button
+            type="button"
             key={r}
             onClick={() => setRole(r)}
             className={

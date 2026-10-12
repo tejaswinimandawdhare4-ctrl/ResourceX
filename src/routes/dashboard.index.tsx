@@ -22,6 +22,8 @@ import {
 } from "@/lib/resourcex-data";
 
 
+import { useAuth } from "@/lib/auth-context";
+
 export const Route = createFileRoute("/dashboard/")({
   head: () => ({
     meta: [
@@ -39,6 +41,7 @@ export const Route = createFileRoute("/dashboard/")({
 });
 
 function DashboardHome() {
+  const { user } = useAuth();
   const demo = useDemoState();
   const totals = liveTotals(demo);
   const series = liveUtilizationSeries(demo);
@@ -59,10 +62,14 @@ function DashboardHome() {
     },
   ];
 
+  const businessSubtitle = user
+    ? `${user.businessName} · ${user.city}`
+    : "Hospitality Provider Dashboard";
+
   return (
     <DashboardShell
       title="Dashboard"
-      subtitle="Hotel Horizon · Andheri East, Mumbai"
+      subtitle={businessSubtitle}
       actions={
         <Button asChild>
           <Link to="/dashboard/add-resource" search={{ edit: undefined }}>Add resource</Link>

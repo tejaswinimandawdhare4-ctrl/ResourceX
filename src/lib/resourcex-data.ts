@@ -561,14 +561,53 @@ export type RequestRecord = {
   status: "Pending" | "Negotiating" | "Accepted" | "Rejected" | "Completed";
 };
 
+const REQUESTS_STORAGE_KEY = "rx_incoming_requests";
+
 export const incomingRequests: RequestRecord[] = [
+  { id: "RQ-2045", business: "Lily", resource: "Banquet Chairs", quantity: 150, date: "15 Sep 2026", time: "5 PM – 11 PM", budget: 7500, status: "Pending" },
   { id: "RQ-2041", business: "Elite Events", resource: "Banquet Chairs", quantity: 150, date: "15 Sep 2026", time: "5 PM – 11 PM", budget: 10000, status: "Negotiating" },
   { id: "RQ-2038", business: "CityServe Hospitality", resource: "Round Tables", quantity: 30, date: "16 Sep 2026", time: "6 PM – 12 AM", budget: 9600, status: "Pending" },
   { id: "RQ-2036", business: "Grand Vista Resort", resource: "4K Projector", quantity: 2, date: "18 Sep 2026", time: "10 AM – 6 PM", budget: 5200, status: "Accepted" },
   { id: "RQ-2030", business: "Urban Banquets", resource: "Parking Spaces", quantity: 80, date: "20 Sep 2026", time: "7 PM – 1 AM", budget: 7200, status: "Pending" },
   { id: "RQ-2024", business: "Crown Hospitality", resource: "Sound System", quantity: 1, date: "22 Sep 2026", time: "4 PM – 11 PM", budget: 6000, status: "Rejected" },
-  { id: "RQ-2011", business: "Elite Events", resource: "Catering Equipment", quantity: 40, date: "02 Sep 2026", time: "9 AM – 9 PM", budget: 8400, status: "Completed" },
 ];
+
+export function getStoredRequests(): RequestRecord[] {
+  if (typeof window === "undefined") return incomingRequests;
+  try {
+    const raw = localStorage.getItem(REQUESTS_STORAGE_KEY);
+    if (!raw) {
+      localStorage.setItem(REQUESTS_STORAGE_KEY, JSON.stringify(incomingRequests));
+      return incomingRequests;
+    }
+    const parsed: RequestRecord[] = JSON.parse(raw);
+    if (!parsed.some((r) => r.business === "Lily" || r.id === "RQ-2045")) {
+      parsed.unshift(incomingRequests[0]!);
+      localStorage.setItem(REQUESTS_STORAGE_KEY, JSON.stringify(parsed));
+    }
+    return parsed;
+  } catch {
+    return incomingRequests;
+  }
+}
+
+export function saveStoredRequests(list: RequestRecord[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(REQUESTS_STORAGE_KEY, JSON.stringify(list));
+  } catch (e) {
+    console.error("Failed to save requests to storage", e);
+  }
+}
+
+export function addIncomingRequest(req: RequestRecord) {
+  incomingRequests.unshift(req);
+  if (typeof window !== "undefined") {
+    const current = getStoredRequests();
+    const updated = [req, ...current.filter((x) => x.id !== req.id)];
+    saveStoredRequests(updated);
+  }
+}
 
 export type BookingRecord = {
   id: string;

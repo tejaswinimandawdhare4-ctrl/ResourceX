@@ -28,10 +28,13 @@ export const getResources = async (
         b.business_type,
         b.location AS business_location,
         b.rating AS business_rating,
-        b.is_verified
+        b.is_verified,
+        ri.image_url
       FROM resources r
       JOIN businesses b
         ON r.business_id = b.id
+      LEFT JOIN resource_images ri
+        ON r.id = ri.resource_id AND ri.is_primary = TRUE
       WHERE 1 = 1
     `;
 

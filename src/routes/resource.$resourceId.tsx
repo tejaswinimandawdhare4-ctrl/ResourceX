@@ -54,6 +54,60 @@ export const Route = createFileRoute("/resource/$resourceId")({
   ),
 });
 
+// Category-specific image sets from Unsplash (free, no auth required)
+const CATEGORY_IMAGES: Record<string, Array<{ url: string; label: string }>> = {
+  Seating: [
+    { url: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80", label: "Inventory photo" },
+    { url: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=600&q=80", label: "Setup view" },
+    { url: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=600&q=80", label: "Storage & handling" },
+  ],
+  Tables: [
+    { url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80", label: "Inventory photo" },
+    { url: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=600&q=80", label: "Setup view" },
+    { url: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=600&q=80", label: "Storage & handling" },
+  ],
+  "AV Equipment": [
+    { url: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80", label: "Inventory photo" },
+    { url: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&q=80", label: "Setup view" },
+    { url: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80", label: "AV equipment" },
+  ],
+  Parking: [
+    { url: "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=600&q=80", label: "Parking area" },
+    { url: "https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?w=600&q=80", label: "Valet zone" },
+    { url: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80", label: "Entry gate" },
+  ],
+  Kitchen: [
+    { url: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80", label: "Kitchen setup" },
+    { url: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=600&q=80", label: "Equipment" },
+    { url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80", label: "Cold storage" },
+  ],
+  Furniture: [
+    { url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80", label: "Furniture" },
+    { url: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80", label: "Setup view" },
+    { url: "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&q=80", label: "Storage" },
+  ],
+  Vehicles: [
+    { url: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=600&q=80", label: "Vehicle fleet" },
+    { url: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=600&q=80", label: "Interior" },
+    { url: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&q=80", label: "Exterior view" },
+  ],
+  Venue: [
+    { url: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=600&q=80", label: "Venue hall" },
+    { url: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=600&q=80", label: "Banquet setup" },
+    { url: "https://images.unsplash.com/photo-1478146059778-26028b07395a?w=600&q=80", label: "Stage & decor" },
+  ],
+};
+
+const DEFAULT_IMAGES = [
+  { url: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80", label: "Inventory photo" },
+  { url: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=600&q=80", label: "Setup view" },
+  { url: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=600&q=80", label: "Storage & handling" },
+];
+
+function getCategoryImages(category: string, _name: string) {
+  return CATEGORY_IMAGES[category] ?? DEFAULT_IMAGES;
+}
+
 function ResourceDetails() {
   const { listing } = Route.useLoaderData();
 
@@ -96,23 +150,23 @@ function ResourceDetails() {
               </div>
             </div>
 
-            {/* Photo strip (illustrative panels) */}
+            {/* Photo strip */}
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              {[0, 1, 2].map((i) => (
+              {getCategoryImages(listing.category, listing.name).map((img, i) => (
                 <div
                   key={i}
-                  className="relative aspect-[4/3] overflow-hidden panel grid-backdrop"
+                  className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border"
                   aria-hidden={i > 0}
                 >
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        "radial-gradient(120% 90% at 30% 15%, oklch(0.851 0.132 183.5 / 0.16), transparent 70%)",
-                    }}
+                  <img
+                    src={img.url}
+                    alt={img.label}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                    loading="lazy"
                   />
-                  <span className="absolute bottom-3 left-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    {["Inventory photo", "Setup view", "Storage & handling"][i]}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <span className="absolute bottom-3 left-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/90">
+                    {img.label}
                   </span>
                 </div>
               ))}
@@ -204,7 +258,11 @@ function ResourceDetails() {
                 {listing.availableDate}
               </p>
               <Button asChild size="lg" className="mt-5 w-full">
-                <Link to="/request/$resourceId" params={{ resourceId: listing.id }}>
+                <Link
+                  to="/request/$resourceId"
+                  params={{ resourceId: listing.id }}
+                  search={{ quantity: listing.quantity }}
+                >
                   Request Resource
                 </Link>
               </Button>

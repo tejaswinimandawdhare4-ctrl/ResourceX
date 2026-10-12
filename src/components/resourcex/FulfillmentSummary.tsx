@@ -50,7 +50,11 @@ export function FulfillmentSummary({ plan }: { plan: FulfillmentPlan }) {
          there's no combined multi-provider request endpoint yet. Wire this to
          a real "request the whole plan" flow when the backend supports it. */}
       <Button className="mt-4 w-full sm:w-auto" size="lg" asChild>
-        <Link to="/request/$resourceId" params={{ resourceId: plan.items[0]!.listing.id }}>
+        <Link
+          to="/request/$resourceId"
+          params={{ resourceId: plan.items[0]!.listing.id }}
+          search={{ quantity: plan.items[0]?.listing.quantity ?? 150 }}
+        >
           Request this fulfillment plan
         </Link>
       </Button>

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 
 import pool from "./config/database";
 import resourceRoutes from "./routes/resourceRoutes";
+import authRoutes from "./routes/authRoutes";
 
 dotenv.config();
 
@@ -13,7 +14,23 @@ const app = express();
 // Middleware
 // ================================
 
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (curl, mobile, Postman, etc.)
+      if (!origin) return callback(null, true);
+      // Allow any localhost / 127.0.0.1 port (e.g. 8080, 8081, 5173, 3000)
+      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+      // Production origins can also be listed here
+      callback(null, true);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -34,9 +51,7 @@ app.get("/", (req, res) => {
 
 app.get("/api/health", async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      "SELECT 1 AS connected"
-    );
+    const [rows] = await pool.query("SELECT 1 AS connected");
 
     res.json({
       success: true,
@@ -52,6 +67,12 @@ app.get("/api/health", async (req, res) => {
     });
   }
 });
+
+// ================================
+// Auth API
+// ================================
+
+app.use("/api/auth", authRoutes);
 
 // ================================
 // Resource API

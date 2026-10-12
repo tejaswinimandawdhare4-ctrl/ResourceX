@@ -1,10 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 import { StatusPill } from "@/components/resourcex/StatusPill";
 import { Button } from "@/components/ui/button";
-import { featuredListing, incomingRequests, inr, type RequestRecord } from "@/lib/resourcex-data";
+import {
+  featuredListing,
+  getStoredRequests,
+  saveStoredRequests,
+  inr,
+  type RequestRecord,
+} from "@/lib/resourcex-data";
 
 export const Route = createFileRoute("/dashboard/requests")({
   head: () => ({
@@ -23,10 +29,18 @@ export const Route = createFileRoute("/dashboard/requests")({
 });
 
 function Requests() {
-  const [rows, setRows] = useState<RequestRecord[]>(incomingRequests);
+  const [rows, setRows] = useState<RequestRecord[]>(getStoredRequests);
+
+  useEffect(() => {
+    setRows(getStoredRequests());
+  }, []);
 
   const act = (id: string, status: RequestRecord["status"]) => {
-    setRows((r) => r.map((x) => (x.id === id ? { ...x, status } : x)));
+    setRows((current) => {
+      const updated = current.map((x) => (x.id === id ? { ...x, status } : x));
+      saveStoredRequests(updated);
+      return updated;
+    });
     toast.success(`Request ${id} ${status.toLowerCase()}`);
   };
 

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { demoStore, useDemoState } from "@/lib/demo-store";
 
+import { useAuth } from "@/lib/auth-context";
+
 export const Route = createFileRoute("/dashboard/verify")({
   head: () => ({
     meta: [
@@ -35,12 +37,13 @@ const docs: Doc[] = [
 ];
 
 function VerifyBusiness() {
+  const { user } = useAuth();
   const state = useDemoState();
   const [files, setFiles] = useState<Record<string, string | null>>({ gst: null, registration: null });
   const uploaded = docs.every((d) => files[d.key]);
 
   const statusLabel =
-    state.verification === "verified"
+    user?.isVerified || state.verification === "verified"
       ? "Verified"
       : state.verification === "pending"
         ? "Pending Verification"
@@ -49,7 +52,7 @@ function VerifyBusiness() {
   return (
     <DashboardShell
       title="Verify Your Business"
-      subtitle="Hotel Horizon · trust & compliance"
+      subtitle={`${user?.businessName ?? "My Business"} · Trust & Compliance`}
       actions={<StatusPill status={statusLabel} />}
     >
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">

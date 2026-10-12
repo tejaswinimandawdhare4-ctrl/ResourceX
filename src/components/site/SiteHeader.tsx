@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { LogOut, Menu, User, X } from "lucide-react";
 import { useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
 
 const nav = [
   { label: "Home", to: "/" },
@@ -15,6 +16,7 @@ const nav = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 glass">
@@ -33,12 +35,36 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="hidden items-center gap-2 sm:flex">
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/login">Login</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link to="/login">Get Started</Link>
-          </Button>
+          {isAuthenticated && user ? (
+            <>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/dashboard" className="flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5 text-primary" />
+                  <span className="max-w-[130px] truncate">
+                    {user.businessName || user.email.split("@")[0]}
+                  </span>
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={logout}
+                title="Log out"
+                aria-label="Log out"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link to="/login">Get Started</Link>
+              </Button>
+            </>
+          )}
         </div>
         <button
           aria-label="Toggle navigation"
@@ -62,14 +88,43 @@ export function SiteHeader() {
               </Link>
             ))}
           </nav>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <Button asChild variant="outline" size="sm" onClick={() => setOpen(false)}>
-              <Link to="/login">Login</Link>
-            </Button>
-            <Button asChild size="sm" onClick={() => setOpen(false)}>
-              <Link to="/login">Get Started</Link>
-            </Button>
-          </div>
+          {isAuthenticated && user ? (
+            <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+              <div className="min-w-0 pr-2">
+                <p className="truncate text-xs font-semibold text-foreground">
+                  {user.businessName || user.email}
+                </p>
+                <p className="truncate text-[10px] text-muted-foreground capitalize">
+                  {user.role} · {user.city}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-1.5">
+                <Button asChild size="sm" variant="outline" onClick={() => setOpen(false)}>
+                  <Link to="/dashboard">Dashboard</Link>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    logout();
+                    setOpen(false);
+                  }}
+                  title="Log out"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Button asChild variant="outline" size="sm" onClick={() => setOpen(false)}>
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button asChild size="sm" onClick={() => setOpen(false)}>
+                <Link to="/login">Get Started</Link>
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </header>

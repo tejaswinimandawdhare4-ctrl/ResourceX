@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { getListing, inr } from "@/lib/resourcex-data";
+import { getListing, inr, addIncomingRequest } from "@/lib/resourcex-data";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/request/$resourceId")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -45,6 +46,7 @@ export const Route = createFileRoute("/request/$resourceId")({
 function RequestPage() {
   const { listing } = Route.useLoaderData();
   const { quantity: requestedQty } = Route.useSearch();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [quantity, setQuantity] = useState(requestedQty);
@@ -56,6 +58,7 @@ function RequestPage() {
     `Setup for ${requestedQty} guests. Need ${listing.name.toLowerCase()} delivered by 3 PM for setup.`,
   );
   const [sent, setSent] = useState(false);
+  const [requestId, setRequestId] = useState("RQ-2042");
 
   useEffect(() => {
     setQuantity(requestedQty);
@@ -68,11 +71,23 @@ function RequestPage() {
     );
     setSent(false);
   }, [listing.id, requestedQty]);
-  
-
-  // ...rest of the file stays exactly the same
 
   const submit = () => {
+    const newId = `RQ-${Math.floor(2050 + Math.random() * 500)}`;
+    setRequestId(newId);
+
+    // Register into provider's incoming requests queue
+    addIncomingRequest({
+      id: newId,
+      business: user?.businessName || "Lily",
+      resource: listing.name,
+      quantity,
+      date: date || "15 Sep 2026",
+      time: `${start} – ${end}`,
+      budget: offer,
+      status: "Pending",
+    });
+
     setSent(true);
     toast.success("Request sent to " + listing.provider, {
       description: "You'll be notified when the provider responds.",
@@ -93,7 +108,7 @@ function RequestPage() {
           <div className="mt-6 panel p-5 text-left text-sm">
             {(
               [
-                ["Request ID", "RQ-2042"],
+                ["Request ID", requestId],
                 ["Resource", listing.name],
                 ["Quantity", `${quantity} units`],
                 ["Window", `${start} – ${end}`],
